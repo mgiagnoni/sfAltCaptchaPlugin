@@ -1,0 +1,132 @@
+# sfAltCaptchaPlugin
+
+This plugin allows you to protect any form in your application with a CAPTCHA test to prevent `non human` spam submissions.
+
+Beside the classic `random code` captcha you can choose a `math captcha` where users must solve a very simple math operation to be able to successfully submit the form.
+
+## Requirements
+
+GD graphics library (version 2 or higher) with support for TrueType fonts must be available as it will be used to create captcha images.
+
+## Installation
+
+    php symfony plugin:install --stability=beta sfAltCaptchaPlugin
+
+`stability` option is required as plugin is currently available only as a beta release.
+
+If you prefer to perform a manual installation, download the compressed package from plugin page on symfony site or GitHub. Uncompress the package in a folder named `sfAltCaptchaPlugin` created inside the `plugins` folder of your project.
+
+Then activate the plugin in your project configuration class
+
+    //%project_dir%/config/ProjectConfigurationClass.class.php
+    ...
+    public function setup()
+    {
+      ...
+      $this->enablePlugins('sfAltCaptchaPlugin');
+    }
+    ...
+
+Whichever installation method you choose, you need to enable plugin module
+
+    # %project_dir%/apps/frontend/config/settings.yml
+
+    all:
+      ...
+      .settings:
+        ...
+        enabled_modules: [default, ... , sfAltCaptcha]
+
+Finally publish plugin assets with the following symfony command
+
+    php symfony plugin:publish-assets
+
+## Form setup
+
+To protect a form with captcha add widget and validator provided by plugin.
+
+    class ContactForm extends BaseForm
+    {
+      public function configure()
+      {
+        parent::configure();
+        // widgets and validators for name, email, message and other fields here
+        $this->widgetSchema['captcha'] = new sfWidgetFormAltCaptcha();
+        $this->widgetSchema['captcha']->setLabel("Enter verification code");
+        $this->validatorSchema['captcha'] = new sfAltCaptchaValidator();
+        ...
+      }
+    }
+
+That's all. A basic, but working captcha will be added to the form.
+
+## Plugin configuration
+
+Several settings are available in plugin configuration to change captcha appearance. Here is an example.
+
+    # %project_dir%/config/app.yml
+    all:
+      sfAltCaptcha:
+        captcha:
+          default:
+            # captcha code length (characters)
+            codeLength: 4
+            # captcha image size
+            width: 150
+            height: 50
+            # captcha code color (R,G,B values)
+            color: [0,0,255]
+            # image background color (R,G,B values)
+            bgColor: [240,240,240]
+            # 'random' or 'math'
+            type: random
+            # when multiple fonts are specified one is randomly
+            # selected to generate the captcha code
+            fonts:
+              # fonts must be present in plugins/sfAltCaptchaPlugin/assets/fonts
+              VeraBd.ttf:
+                # font size
+                min_size: 28
+                max_size: 32
+                # character rotation (degrees)
+                min_rotation: -5
+                max_rotation: 9
+                # character spacing (pixels)
+                min_spacing: -4
+              Vera.ttf:
+                min_size: 25
+                max_size: 29
+                min_rotation: -5
+                max_rotation: 9
+                min_spacing: -6
+
+Another example of configuration this time for a `math captcha`.
+
+    # %your_project_dir%/config/app.yml
+    all:
+      sfAltCaptcha:
+        captcha:
+          default:
+            width: 120
+            height: 40
+            type: math
+            maxOperandValue: 9
+            numOperands: 2
+            # no text distortion
+            waveEffect: false
+            fonts:
+              Vera.ttf:
+                # fixed size
+                min_size: 20
+                min_rotation: -12
+                max_rotation: 11
+                # fixed spacing
+                min_spacing: -4
+
+## Note for developers
+
+sfAltCaptchaPlugin repository is hosted at GitHub, your forks and pull requests are welcome.
+
+## Todo
+
+* Audio captcha

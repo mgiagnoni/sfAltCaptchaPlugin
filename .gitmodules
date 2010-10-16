@@ -1,0 +1,3 @@
+[submodule "lib/MultiCaptcha"]
+	path = lib/MultiCaptcha
+	url = git://github.com/mgiagnoni/MultiCaptcha.git
